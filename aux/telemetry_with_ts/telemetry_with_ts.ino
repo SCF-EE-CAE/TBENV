@@ -19,9 +19,8 @@ constexpr uint16_t MAX_MESSAGE_SIZE = 128U;
 constexpr uint32_t SERIAL_DEBUG_BAUD = 115200U;
 
 
+// Initalize the Mqtt client and Thingsboard instance
 WiFiClient espClient;
-
-// Initalize the Mqtt client instance
 Arduino_MQTT_Client mqttClient(espClient);
 ThingsBoard tb(mqttClient, MAX_MESSAGE_SIZE);
 
