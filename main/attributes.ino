@@ -38,17 +38,17 @@ void sendSystemInfo() {
  * 
  * @param label The label for the status attribute.
  * @param status The status data to send.
- * @param delay Flag indicating whether to introduce a delay for delivery (default: false).
+ * @param delay Flag indicating whether to introduce a delay for delivery.
  * 
  * @remarks The attribute name is constructed by appending "_status" to the label.
- * @remarks If delay is true, a delay of 5000 milliseconds (5 seconds) is introduced.
+ * @remarks If delay is true, a delay of 5000 milliseconds (5 seconds) is introduced after the message is sent.
  */
-void sendStatus(const char *label, const char *status, bool delay = false) {
+void sendStatus(const char *label, const char *status, bool wait) {
   char attributeName[25];
 
   snprintf(attributeName, sizeof(attributeName), "%s_status", label);
   tb.sendAttributeData(attributeName, status);
 
-  if(delay) // delay to wait for delivery
+  if(wait) // delay to wait for delivery
     delay(5000); 
 }

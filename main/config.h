@@ -34,6 +34,18 @@
 #define DHT_PIN 2
 #define DHT_N_SAMPLINGS 5
 
+// DS18B20
+#define DS18B20_PIN 2
+#define DS18B20_N_SAMPLINGS 5
+
+// BME280
+#define BME_SDA_PIN 0
+#define BME_SCL_PIN 2
+
+/*
+    General configuration values
+*/
+
 #define MAX_VALUES_READ 5   // number of values a sensor can output, for example BME280 has 3: temperature, pressure, humidity
 #define DECIMAL_PRECISION 1 // number of digits as decimal places
 

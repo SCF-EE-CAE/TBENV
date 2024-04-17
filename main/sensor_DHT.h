@@ -19,7 +19,7 @@ public:
 
   bool readValues(StaticJsonDocument<JSON_OBJECT_SIZE(MAX_VALUES_READ)>& values) override {
     float temp, hum;
-    float temp_avg = 0, hum_avg = 0; // Initialize accumulator variables
+    float temp_avg = 0, hum_avg = 0;
 
     Serial.println("Measuring values:");
 
@@ -29,13 +29,16 @@ public:
 
       Serial.printf("Sample number %d: temp = %.1f, hum = %.1f\n", sample + 1, temp, hum);
 
-      temp_avg += temp / DHT_N_SAMPLINGS;
-      hum_avg += hum / DHT_N_SAMPLINGS;
+      temp_avg += temp;
+      hum_avg += hum;
     }
 
-    // save values in values JSON with 2 decimal places
+    temp_avg /= DHT_N_SAMPLINGS;
+    hum_avg  /= DHT_N_SAMPLINGS;
+
+    // save values in values JSON with defined number of decimal places
     values["temperature"] = serialized(String(temp_avg, DECIMAL_PRECISION));
-    values["humidity"] =    serialized(String(hum_avg,  DECIMAL_PRECISION));;
+    values["humidity"] =    serialized(String(hum_avg,  DECIMAL_PRECISION));
 
     Serial.println("Final values:");
     serializeJson(values, Serial);
@@ -45,7 +48,7 @@ public:
   }
 
 private:
-  DHT dht; // Member variable declaration
+  DHT dht;
 
   bool read(float& temperature, float& humidity, int maxAttempts = 3) {
     for(int attempt = 0; attempt < maxAttempts; attempt++) {

@@ -30,13 +30,13 @@
 #elif defined(SENSOR_TYPE_DS18B20)
 
   #include "sensor_DS18B20.h"
-  Sensor_DS18B20 sensor;
+  Sensor_DS18B20 sensor(DS18B20_PIN);
   #define SENSOR_TYPE_STR "DS18B20"
 
 #elif defined(SENSOR_TYPE_BME280)
 
   #include "sensor_BME280.h"
-  Sensor_BME280 sensor;
+  Sensor_BME280 sensor(BME_SDA_PIN, BME_SCL_PIN);
   #define SENSOR_TYPE_STR "BME280"
 
 #else
@@ -93,7 +93,7 @@ void setup() {
     delay(1000);
   }
   Serial.println("NTP time set successfully.");
-  sendStatus("NTP", "OK");
+  sendStatus("NTP", "OK", false);
 
   // Initialize and test sensor
   sensor.init();
@@ -104,7 +104,7 @@ void setup() {
     ESP.restart();
   }
   Serial.println("Sensor OK.");
-  sendStatus("SENSOR", "OK");
+  sendStatus("SENSOR", "OK", false);
 }
 
 void loop() {
