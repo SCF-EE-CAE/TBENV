@@ -2,6 +2,8 @@
 #include <ESP8266WiFi.h>
 
 // MQTT and Thingsboard libraries
+#define THINGSBOARD_ENABLE_PROGMEM 0 // ESP8266 does not support Strings in flash memory
+#define THINGSBOARD_ENABLE_DEBUG 0 // debug mode select
 #include <Arduino_MQTT_Client.h>
 #include <ThingsBoard.h>
 
@@ -15,26 +17,26 @@
 // Selected sensor setup and libraries
 #ifdef SENSOR_TYPE_DHT11
 
-  #include "sensor_DHT11.h"
-  SensorInterface sensor = Sensor_DHT11();
+  #include "sensor_DHT.h"
+  Sensor_DHT sensor(DHT_PIN, DHT11);
   #define SENSOR_TYPE_STR "DHT11"
 
 #elif defined(SENSOR_TYPE_DHT22)
 
-  #include "sensor_DHT22.h"
-  SensorInterface sensor = Sensor_DHT22();
+  #include "sensor_DHT.h"
+  Sensor_DHT sensor(DHT_PIN, DHT22);
   #define SENSOR_TYPE_STR "DHT22"
 
 #elif defined(SENSOR_TYPE_DS18B20)
 
   #include "sensor_DS18B20.h"
-  SensorInterface sensor = Sensor_DS18B20();
+  Sensor_DS18B20 sensor;
   #define SENSOR_TYPE_STR "DS18B20"
 
 #elif defined(SENSOR_TYPE_BME280)
 
   #include "sensor_BME280.h"
-  SensorInterface sensor = Sensor_BME280();
+  Sensor_BME280 sensor;
   #define SENSOR_TYPE_STR "BME280"
 
 #else
@@ -46,13 +48,114 @@
   #error "Only one sensor type should be defined at a time."
 #endif
 
+// Initalize the Mqtt client and Thingsboard instance
+WiFiClient espClient;
+Arduino_MQTT_Client mqttClient(espClient);
+ThingsBoard tb(mqttClient, TB_MAX_MESSAGE_SIZE);
+
+// Define NTP Client to get time
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, NTP_SERVER);
+
+// JSON objects for telemetry data
+StaticJsonDocument<JSON_OBJECT_SIZE(MAX_VALUES_READ)> values;
+StaticJsonDocument<JSON_OBJECT_SIZE(MAX_VALUES_READ + 1)> telemetry;
+
+// Track last data send status
+bool lastDataSent = true;
 
 void setup() {
-  // put your setup code here, to run once:
+  Serial.begin(SERIAL_BAUD_RATE);
+  delay(500); // wait for Serial begin
 
+  // Show MAC
+  Serial.printf("\n\nMAC address: %s\n", WiFi.macAddress().c_str());
+
+  // Connect to WiFi and Thingsboard
+  connect();
+  
+  // Send system info to TB (attributes)
+  sendSystemInfo();
+
+  // Initialize NTP client
+  timeClient.begin();
+
+  // Get time for the first time, timesout in 30s after start
+  // Send to Thingsboard status of NTP time
+  while(!timeClient.isTimeSet()) {
+    Serial.println("Waiting for time to be set by NTP.");
+    if(millis() > 30000) {
+      Serial.println("Taking too long. Reporting error and restarting.");
+      sendStatus("NTP", "ERROR", true);
+      ESP.restart();
+    }
+    timeClient.update();
+    delay(1000);
+  }
+  Serial.println("NTP time set successfully.");
+  sendStatus("NTP", "OK");
+
+  // Initialize and test sensor
+  sensor.init();
+  
+  if(!sensor.test()) {
+    Serial.println("Sensor error.");
+    sendStatus("SENSOR", "ERROR", true);
+    ESP.restart();
+  }
+  Serial.println("Sensor OK.");
+  sendStatus("SENSOR", "OK");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  delay(500);
 
+  // Reestablish connection with TB, if lost
+  connect();
+
+  // MQTT send / receive routines
+  tb.loop();
+
+  // Retries to send last data
+  if(!lastDataSent) {
+    Serial.printf("Retrying to send data.");
+    tb.sendTelemetryJson(telemetry, measureJson(telemetry) + 1);
+    lastDataSent = true;
+  }
+
+  int seconds = timeClient.getSeconds();
+  if(seconds == 0 || seconds == 30) {
+    // save timestamp in seconds
+    uint64_t timestamp = timeClient.getEpochTime();
+
+    // Clear JSON objects
+    values.clear();
+    telemetry.clear();
+
+    // read sensor and manage error
+    bool status;
+    status = sensor.readValues(values);
+    
+    if(!status) {
+      Serial.println("Sensor error.");
+      sendStatus("SENSOR", "ERROR", true);
+      ESP.restart();
+    }
+
+    // build telemetry json
+    telemetry["ts"] = timestamp * 1000UL; // to ms
+    telemetry["values"] = values;
+
+    Serial.println("Sending JSON to server");
+
+    // send telemetry json
+    lastDataSent = tb.sendTelemetryJson(telemetry, measureJson(telemetry) + 1);
+
+    Serial.printf("Send %s", lastDataSent ? "success.\n" : "failed, trying again soon.\n");
+
+    // Update internal time with NTP server
+    timeClient.update();
+
+    delay(1100); // wait for second finish
+  }
 }

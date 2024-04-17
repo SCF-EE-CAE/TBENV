@@ -18,6 +18,9 @@
 // NTP server address
 #define NTP_SERVER ""
 
+// BAUD rate for Serial port
+#define SERIAL_BAUD_RATE 115200
+
 /*
     Sensor configuration, only one of the sensor types should be defined.
 */
@@ -26,3 +29,11 @@
 // #define SENSOR_TYPE_DHT22
 // #define SENSOR_TYPE_DS18B20
 // #define SENSOR_TYPE_BME280
+
+// DHT11/DHT22
+#define DHT_PIN 2
+#define DHT_N_SAMPLINGS 5
+
+#define MAX_VALUES_READ 5   // number of values a sensor can output, for example BME280 has 3: temperature, pressure, humidity
+#define DECIMAL_PRECISION 1 // number of digits as decimal places
+
