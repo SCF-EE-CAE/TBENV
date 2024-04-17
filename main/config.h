@@ -1,5 +1,5 @@
 // Code version
-#define FIRMWARE_VERSION "beta"
+#define FIRMWARE_VERSION "v1_beta"
 
 // WiFi Credentials
 #define WIFI_SSID     ""
