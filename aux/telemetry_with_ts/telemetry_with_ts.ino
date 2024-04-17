@@ -1,6 +1,7 @@
 #include <ESP8266WiFi.h>
 
 #define THINGSBOARD_ENABLE_PROGMEM 0
+#define THINGSBOARD_ENABLE_DEBUG 1
 
 #include <Arduino_MQTT_Client.h>
 #include <ThingsBoard.h>
@@ -81,24 +82,22 @@ void loop() {
       Serial.println("Failed to connect");
       return;
     }
+    Serial.println("connected");
   }
 
   // allocate the memory for the document
   StaticJsonDocument<JSON_OBJECT_SIZE(2)> values;
   StaticJsonDocument<JSON_OBJECT_SIZE(4)> telemetry;
 
-  values["temp"] = 42.2;
-  values["hum"] = 70;
-  telemetry["ts"] = 1713279600000;
+  uint64_t ts = 1713279600;
+
+  values["temp"] = random(10, 31);
+  values["hum"] = random(0, 100);
+  telemetry["ts"] = ts * 1000UL;;
   telemetry["values"] = values;
 
-  char telemetry_str[200];
-  serializeJson(telemetry, telemetry_str);
-
-  Serial.println("Sending JSON string...");
-  Serial.println(telemetry_str);
-  
-  bool status = tb.sendTelemetryJson((const char*)telemetry_str);
+  Serial.println("Sending JSON...");
+  bool status = tb.sendTelemetryJson(telemetry, measureJson(telemetry) + 1);
   Serial.println(status ? "success" : "fail");
 
   tb.loop();
