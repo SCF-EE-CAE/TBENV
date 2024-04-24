@@ -23,8 +23,8 @@
 #define SERIAL_BAUD_RATE 115200
 
 // Define custom MAC address, if needed. Comment out to use original MAC
-#define CUSTOM_MAC_ADDRESS
-uint8_t customMacAddress[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+// #define CUSTOM_MAC_ADDRESS
+// uint8_t customMacAddress[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 /*
     Sensor configuration, only one of the sensor types should be defined.
@@ -51,7 +51,7 @@ uint8_t customMacAddress[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     General configuration values
 */
 
-#define MAX_VALUES_READ 5   // number of values produced and sent as telemetry
+#define MAX_VALUES_READ 10   // number of values produced and sent as telemetry
                             // 5: temperature, relative humidity, absolute humidity
                             // humidity ratio and pressure
 #define DECIMAL_PRECISION 1 // number of digits as decimal places
