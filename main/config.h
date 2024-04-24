@@ -1,5 +1,5 @@
 // Code version
-#define FIRMWARE_VERSION "v1_beta"
+#define FIRMWARE_VERSION "v1"
 
 // WiFi Credentials
 #define WIFI_SSID     ""
@@ -13,7 +13,7 @@
 #define TB_TOKEN ""
 
 // Size of JSON message buffer
-#define TB_MAX_MESSAGE_SIZE	128U
+#define TB_MAX_MESSAGE_SIZE	256U
 
 // NTP server address and update interval
 #define NTP_SERVER "ntp.cti.gov.br"
@@ -51,18 +51,27 @@ uint8_t customMacAddress[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     General configuration values
 */
 
-#define MAX_VALUES_READ 5   // number of values a sensor can output, for example BME280 has 3: temperature, pressure, humidity
+#define MAX_VALUES_READ 5   // number of values produced and sent as telemetry
+                            // 5: temperature, relative humidity, absolute humidity
+                            // humidity ratio and pressure
 #define DECIMAL_PRECISION 1 // number of digits as decimal places
+#define DEFAULT_PRESSURE 950 // hPa
 
 /*
-  Key name
+  Key names and units of measurement
 */
 
 constexpr char KEY_TEMPERATURE[]  = "temperature";
 constexpr char UNIT_TEMPERATURE[] = "C";
 
-constexpr char KEY_HUMIDITY[]  = "humidity";
-constexpr char UNIT_HUMIDITY[] = "percent";
+constexpr char KEY_RELATIVE_HUMIDITY[]  = "relativeH";
+constexpr char UNIT_RELATIVE_HUMIDITY[] = "%";
+
+constexpr char KEY_ABSOLUTE_HUMIDITY[]  = "absoluteH";
+constexpr char UNIT_ABSOLUTE_HUMIDITY[] = "g/m3";
+
+constexpr char KEY_HUMIDITY_RATIO[]  = "ratioH";
+constexpr char UNIT_HUMIDITY_RATIO[] = "g/kg";
 
 constexpr char KEY_PRESSURE[]  = "pressure";
 constexpr char UNIT_PRESSURE[] = "hPa";

@@ -6,6 +6,9 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
+// Definitions of humidity calculation functions
+#include "humidity_calc.h"
+
 class Sensor_BME280 : public SensorInterface {
 public:
   // Constructor with SDA and SCL parameters
@@ -36,9 +39,12 @@ public:
       return false;
     
     // save values in values JSON with defined number of decimal places
-    values[KEY_TEMPERATURE] = serialized(String(temp, DECIMAL_PRECISION));
-    values[KEY_HUMIDITY] =    serialized(String(hum,  DECIMAL_PRECISION));
-    values[KEY_PRESSURE] =    serialized(String(pres, DECIMAL_PRECISION));
+    values[KEY_TEMPERATURE] =       serialized(String(temp, DECIMAL_PRECISION));
+    values[KEY_RELATIVE_HUMIDITY] = serialized(String(hum,  DECIMAL_PRECISION));
+    values[KEY_PRESSURE] =          serialized(String(pres, DECIMAL_PRECISION));
+
+    calc_AH(temp, hum, values);
+    calc_HR(temp, hum, pres, values);
 
     Serial.println("Final values:");
     serializeJson(values, Serial);

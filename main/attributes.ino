@@ -59,17 +59,31 @@ bool sendUnitsOfMeasurement() {
           return false;
       }
 
-      if(strcmp(pair.key().c_str(), KEY_HUMIDITY) == 0) {
-        snprintf(auxBuffer, sizeof(auxBuffer), "%s_unit", KEY_HUMIDITY);
-        if(!tb.sendAttributeData(auxBuffer, UNIT_HUMIDITY))
+      else if(strcmp(pair.key().c_str(), KEY_RELATIVE_HUMIDITY) == 0) {
+        snprintf(auxBuffer, sizeof(auxBuffer), "%s_unit", KEY_RELATIVE_HUMIDITY);
+        if(!tb.sendAttributeData(auxBuffer, UNIT_RELATIVE_HUMIDITY))
           return false;
       }
 
-      if(strcmp(pair.key().c_str(), KEY_PRESSURE) == 0) {
+      else if(strcmp(pair.key().c_str(), KEY_ABSOLUTE_HUMIDITY) == 0) {
+        snprintf(auxBuffer, sizeof(auxBuffer), "%s_unit", KEY_ABSOLUTE_HUMIDITY);
+        if(!tb.sendAttributeData(auxBuffer, UNIT_ABSOLUTE_HUMIDITY))
+          return false;
+      }
+
+      else if(strcmp(pair.key().c_str(), KEY_HUMIDITY_RATIO) == 0) {
+        snprintf(auxBuffer, sizeof(auxBuffer), "%s_unit", KEY_HUMIDITY_RATIO);
+        if(!tb.sendAttributeData(auxBuffer, UNIT_HUMIDITY_RATIO))
+          return false;
+      }
+
+      else if(strcmp(pair.key().c_str(), KEY_PRESSURE) == 0) {
         snprintf(auxBuffer, sizeof(auxBuffer), "%s_unit", KEY_PRESSURE);
         if(!tb.sendAttributeData(auxBuffer, UNIT_PRESSURE))
           return false;
       }
+
+      else return false; // unrecognized value
   }
 
   return true;

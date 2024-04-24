@@ -4,6 +4,9 @@
 // DHT sensor library
 #include "DHT.h"
 
+// Definitions of humidity calculation functions
+#include "humidity_calc.h"
+
 class Sensor_DHT : public SensorInterface {
 public:
   Sensor_DHT(int pin, int type) : dht(pin, type) {} // Constructor initializer list for initializing dht
@@ -43,8 +46,11 @@ public:
     hum_avg  /= samplesRead;
 
     // save values in values JSON with defined number of decimal places
-    values[KEY_TEMPERATURE] = serialized(String(temp_avg, DECIMAL_PRECISION));
-    values[KEY_HUMIDITY] =    serialized(String(hum_avg,  DECIMAL_PRECISION));
+    values[KEY_TEMPERATURE] =       serialized(String(temp_avg, DECIMAL_PRECISION));
+    values[KEY_RELATIVE_HUMIDITY] = serialized(String(hum_avg,  DECIMAL_PRECISION));
+
+    calc_AH(temp_avg, hum_avg, values);
+    calc_HR(temp_avg, hum_avg, DEFAULT_PRESSURE, values);
 
     Serial.println("Final values:");
     serializeJson(values, Serial);
