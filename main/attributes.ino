@@ -30,6 +30,52 @@ void sendSystemInfo() {
 }
 
 /**
+ * @brief Sends units of measurement to the ThingsBoard server.
+ * 
+ * This function retrieves sensor values and sends their corresponding units of measurement
+ * to the ThingsBoard server as attributes.
+ * 
+ * @return true if the units of measurement were successfully sent, false otherwise.
+ * 
+ * @remarks The global variables SENSOR_TYPE_STR, KEY_TEMPERATURE, KEY_HUMIDITY, 
+ *          KEY_PRESSURE, UNIT_TEMPERATURE, UNIT_HUMIDITY, and UNIT_PRESSURE must be 
+ *          properly defined for this function to work correctly.
+ * @remarks The function relies on an external sensor object named 'sensor' and an 
+ *          external ThingsBoard object named 'tb' for retrieving sensor values and 
+ *          sending attribute data respectively.
+ */
+bool sendUnitsOfMeasurement() {
+  char auxBuffer[30];
+
+  bool status = sensor.readValues(values);
+
+  if(!status)
+    return false;
+
+  for (JsonPair pair : values.as<JsonObject>()) {
+      if(strcmp(pair.key().c_str(), KEY_TEMPERATURE) == 0) {
+        snprintf(auxBuffer, sizeof(auxBuffer), "%s_unit", KEY_TEMPERATURE);
+        if(!tb.sendAttributeData(auxBuffer, UNIT_TEMPERATURE))
+          return false;
+      }
+
+      if(strcmp(pair.key().c_str(), KEY_HUMIDITY) == 0) {
+        snprintf(auxBuffer, sizeof(auxBuffer), "%s_unit", KEY_HUMIDITY);
+        if(!tb.sendAttributeData(auxBuffer, UNIT_HUMIDITY))
+          return false;
+      }
+
+      if(strcmp(pair.key().c_str(), KEY_PRESSURE) == 0) {
+        snprintf(auxBuffer, sizeof(auxBuffer), "%s_unit", KEY_PRESSURE);
+        if(!tb.sendAttributeData(auxBuffer, UNIT_PRESSURE))
+          return false;
+      }
+  }
+
+  return true;
+}
+
+/**
  * @brief Sends status data to the ThingsBoard server.
  * 
  * This function constructs an attribute name using the provided label

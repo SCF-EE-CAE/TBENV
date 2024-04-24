@@ -43,8 +43,8 @@ public:
     hum_avg  /= samplesRead;
 
     // save values in values JSON with defined number of decimal places
-    values["temperature"] = serialized(String(temp_avg, DECIMAL_PRECISION));
-    values["humidity"] =    serialized(String(hum_avg,  DECIMAL_PRECISION));
+    values[KEY_TEMPERATURE] = serialized(String(temp_avg, DECIMAL_PRECISION));
+    values[KEY_HUMIDITY] =    serialized(String(hum_avg,  DECIMAL_PRECISION));
 
     Serial.println("Final values:");
     serializeJson(values, Serial);

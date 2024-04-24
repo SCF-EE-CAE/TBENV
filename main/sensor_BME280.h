@@ -36,9 +36,9 @@ public:
       return false;
     
     // save values in values JSON with defined number of decimal places
-    values["temperature"] = serialized(String(temp, DECIMAL_PRECISION));
-    values["humidity"] =    serialized(String(hum,  DECIMAL_PRECISION));
-    values["pressure"] =    serialized(String(pres, DECIMAL_PRECISION));
+    values[KEY_TEMPERATURE] = serialized(String(temp, DECIMAL_PRECISION));
+    values[KEY_HUMIDITY] =    serialized(String(hum,  DECIMAL_PRECISION));
+    values[KEY_PRESSURE] =    serialized(String(pres, DECIMAL_PRECISION));
 
     Serial.println("Final values:");
     serializeJson(values, Serial);

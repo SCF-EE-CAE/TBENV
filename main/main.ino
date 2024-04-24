@@ -105,6 +105,15 @@ void setup() {
   }
   Serial.println("Sensor OK.");
   sendStatus("SENSOR", "OK", false);
+
+  // Send units of measurement of data produced by the sensor
+  if(!sendUnitsOfMeasurement()) {
+    Serial.println("Error sending units.");
+    sendStatus("UNITS", "ERROR", true);
+    ESP.restart();
+  }
+  Serial.println("Send units OK.");
+  sendStatus("UNITS", "OK", false);
 }
 
 void loop() {

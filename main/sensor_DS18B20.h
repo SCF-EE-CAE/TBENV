@@ -42,7 +42,7 @@ public:
     temp_avg /= samplesRead; // Calculate average temperature
 
     // Save temperature values in values JSON with defined number of decimal places
-    values["temperature"] = serialized(String(temp_avg, DECIMAL_PRECISION));
+    values[KEY_TEMPERATURE] = serialized(String(temp_avg, DECIMAL_PRECISION));
 
     Serial.println("Final values:");
     serializeJson(values, Serial);

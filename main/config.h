@@ -53,3 +53,15 @@ uint8_t customMacAddress[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 #define MAX_VALUES_READ 5   // number of values a sensor can output, for example BME280 has 3: temperature, pressure, humidity
 #define DECIMAL_PRECISION 1 // number of digits as decimal places
 
+/*
+  Key name
+*/
+
+constexpr char KEY_TEMPERATURE[]  = "temperature";
+constexpr char UNIT_TEMPERATURE[] = "C";
+
+constexpr char KEY_HUMIDITY[]  = "humidity";
+constexpr char UNIT_HUMIDITY[] = "percent";
+
+constexpr char KEY_PRESSURE[]  = "pressure";
+constexpr char UNIT_PRESSURE[] = "hPa";

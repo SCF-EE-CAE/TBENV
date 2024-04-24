@@ -22,7 +22,7 @@ void WiFi_connect() {
   // Set custom MAC, if defined
   #ifdef CUSTOM_MAC_ADDRESS
   wifi_set_macaddr(STATION_IF, &customMacAddress[0]);
-  Serial.printf("\n\nUsing custom MAC address: %s\n", WiFi.macAddress().c_str());
+  Serial.printf("Using custom MAC address: %s\n", WiFi.macAddress().c_str());
   #endif
 
   // Attempting to establish a connection to the given WiFi network
