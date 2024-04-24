@@ -16,8 +16,16 @@ void WiFi_connect() {
   Serial.print("Connecting to AP, SSID: ");
   Serial.println(WIFI_SSID);
 
-  // Attempting to establish a connection to the given WiFi network
+  // Set station mode
   WiFi.mode(WIFI_STA);
+
+  // Set custom MAC, if defined
+  #ifdef CUSTOM_MAC_ADDRESS
+  wifi_set_macaddr(STATION_IF, &customMacAddress[0]);
+  Serial.printf("\n\nUsing custom MAC address: %s\n", WiFi.macAddress().c_str());
+  #endif
+
+  // Attempting to establish a connection to the given WiFi network
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   int8_t ret;

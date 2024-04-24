@@ -21,6 +21,10 @@
 // BAUD rate for Serial port
 #define SERIAL_BAUD_RATE 115200
 
+// Define custom MAC address, if needed. Comment out to use original MAC
+#define CUSTOM_MAC_ADDRESS
+uint8_t customMacAddress[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
 /*
     Sensor configuration, only one of the sensor types should be defined.
 */
