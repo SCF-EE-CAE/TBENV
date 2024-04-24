@@ -32,7 +32,8 @@ public:
   bool readValues(StaticJsonDocument<JSON_OBJECT_SIZE(MAX_VALUES_READ)>& values) override {
     float temp, hum, pres;
 
-    read(temp, hum, pres);
+    if(!read(temp, hum, pres))
+      return false;
     
     // save values in values JSON with defined number of decimal places
     values["temperature"] = serialized(String(temp, DECIMAL_PRECISION));

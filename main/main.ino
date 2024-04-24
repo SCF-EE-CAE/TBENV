@@ -100,7 +100,7 @@ void setup() {
   
   if(!sensor.test()) {
     Serial.println("Sensor error.");
-    sendStatus("SENSOR", "ERROR", true);
+    sendStatus("SENSOR", "INIT_ERROR", true);
     ESP.restart();
   }
   Serial.println("Sensor OK.");
@@ -119,8 +119,7 @@ void loop() {
   // Retries to send last data
   if(!lastDataSent) {
     Serial.printf("Retrying to send data.");
-    tb.sendTelemetryJson(telemetry, measureJson(telemetry) + 1);
-    lastDataSent = true;
+    lastDataSent = tb.sendTelemetryJson(telemetry, measureJson(telemetry) + 1);
   }
 
   int seconds = timeClient.getSeconds();
@@ -133,28 +132,42 @@ void loop() {
     telemetry.clear();
 
     // read sensor and manage error
-    bool status;
-    status = sensor.readValues(values);
+    bool status = sensor.readValues(values);
+    bool valuesToSend = !values.isNull();
     
     if(!status) {
-      Serial.println("Sensor error.");
-      sendStatus("SENSOR", "ERROR", true);
-      ESP.restart();
+      if(!valuesToSend) {
+        // error status and no output in values JSON
+        Serial.println("Sensor error.");
+        sendStatus("SENSOR", "ERROR", false);
+
+        lastDataSent = true;
+      }
+      else {
+        // error status but produced values
+        Serial.println("Sensor warning.");
+        sendStatus("SENSOR", "WARNING", false);
+      }
     }
+    else
+      sendStatus("SENSOR", "OK", false);
 
-    // build telemetry json
-    telemetry["ts"] = timestamp * 1000UL; // to ms
-    telemetry["values"] = values;
+    // if some output was produced
+    if(valuesToSend) {
+      // build telemetry json
+      telemetry["ts"] = timestamp * 1000UL; // to ms
+      telemetry["values"] = values;
 
-    Serial.println("Sending JSON to server");
+      Serial.println("Sending JSON to server");
 
-    // send telemetry json
-    lastDataSent = tb.sendTelemetryJson(telemetry, measureJson(telemetry) + 1);
+      // send telemetry json
+      lastDataSent = tb.sendTelemetryJson(telemetry, measureJson(telemetry) + 1);
 
-    Serial.printf("Send %s", lastDataSent ? "success.\n" : "failed, trying again soon.\n");
+      Serial.printf("Send %s", lastDataSent ? "success.\n" : "failed, trying again soon.\n");
 
-    // Update internal time with NTP server
-    timeClient.update();
+      // Update internal time with NTP server
+      timeClient.update();
+    }
 
     delay(1100); // wait for second finish
   }

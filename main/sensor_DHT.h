@@ -20,21 +20,27 @@ public:
   bool readValues(StaticJsonDocument<JSON_OBJECT_SIZE(MAX_VALUES_READ)>& values) override {
     float temp, hum;
     float temp_avg = 0, hum_avg = 0;
+    int samplesRead = 0;
 
     Serial.println("Measuring values:");
 
     for(int sample = 0; sample < DHT_N_SAMPLINGS; sample++) {
       if(!read(temp, hum))
-        return false;
+        continue;
 
       Serial.printf("Sample number %d: temp = %.1f, hum = %.1f\n", sample + 1, temp, hum);
 
       temp_avg += temp;
       hum_avg += hum;
+
+      samplesRead++;
     }
 
-    temp_avg /= DHT_N_SAMPLINGS;
-    hum_avg  /= DHT_N_SAMPLINGS;
+    if(samplesRead == 0)
+      return false;
+
+    temp_avg /= samplesRead;
+    hum_avg  /= samplesRead;
 
     // save values in values JSON with defined number of decimal places
     values["temperature"] = serialized(String(temp_avg, DECIMAL_PRECISION));
@@ -44,7 +50,7 @@ public:
     serializeJson(values, Serial);
     Serial.println();
 
-    return true;
+    return samplesRead == DHT_N_SAMPLINGS;
   }
 
 private:
