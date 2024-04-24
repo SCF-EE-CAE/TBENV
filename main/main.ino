@@ -64,6 +64,9 @@ StaticJsonDocument<JSON_OBJECT_SIZE(MAX_VALUES_READ + 1)> telemetry;
 // Track last data send status
 bool lastDataSent = true;
 
+// Track last NTP update sucessfull
+uint64_t lastNtpUpdateTs;
+
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
   delay(500); // wait for Serial begin
@@ -94,6 +97,8 @@ void setup() {
   }
   Serial.println("NTP time set successfully.");
   sendStatus("NTP", "OK", false);
+
+  lastNtpUpdateTs = timeClient.getEpochTime(); // save time of NTP set
 
   // Initialize and test sensor
   sensor.init();
@@ -173,9 +178,26 @@ void loop() {
       lastDataSent = tb.sendTelemetryJson(telemetry, measureJson(telemetry) + 1);
 
       Serial.printf("Send %s", lastDataSent ? "success.\n" : "failed, trying again soon.\n");
+    }
 
-      // Update internal time with NTP server
-      timeClient.update();
+    // Check for time with no update from NTP server and update
+
+    timestamp = timeClient.getEpochTime();
+    uint64_t timeSinceLastUpdate = timestamp - lastNtpUpdateTs;
+    
+    if(timeSinceLastUpdate > NTP_UPDATE_INTERVAL) {
+      status = timeClient.forceUpdate();
+
+      // Report WARNING, with time with no update
+      if(status) {
+        lastNtpUpdateTs = timeClient.getEpochTime();
+        sendStatus("NTP", "OK", false);
+      }
+      else if(timeSinceLastUpdate >= 3 * NTP_UPDATE_INTERVAL) {
+        char auxBuffer[30];
+        snprintf(auxBuffer, sizeof(auxBuffer), "WARNING_%dh", timeSinceLastUpdate/3600);
+        sendStatus("NTP", auxBuffer, false);
+      }
     }
 
     delay(1100); // wait for second finish

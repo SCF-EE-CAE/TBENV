@@ -15,8 +15,9 @@
 // Size of JSON message buffer
 #define TB_MAX_MESSAGE_SIZE	128U
 
-// NTP server address
-#define NTP_SERVER ""
+// NTP server address and update interval
+#define NTP_SERVER "ntp.cti.gov.br"
+#define NTP_UPDATE_INTERVAL 21600UL // in seconds (6 hours)
 
 // BAUD rate for Serial port
 #define SERIAL_BAUD_RATE 115200
