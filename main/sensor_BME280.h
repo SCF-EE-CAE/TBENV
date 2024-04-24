@@ -53,9 +53,9 @@ private:
   int sclPin;
 
   bool read(float& temperature, float& humidity, float& pressure, int maxAttempts = 3) {
-    bme.takeForcedMeasurement();
-    
     for (int attempt = 0; attempt < maxAttempts; attempt++) {
+      bme.takeForcedMeasurement();
+
       temperature = bme.readTemperature(); // Celsius
       pressure = bme.readPressure() / 100.0F;
       humidity = bme.readHumidity();
