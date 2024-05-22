@@ -1,4 +1,4 @@
-# TBENV
+# TBENV - v2
 
 Código do módulo ambiental do projeto, suporta os sensores DHT, BME280 e DS18B20. Código principal presente na pasta _main_ e códigos de teste na pasta _aux_.
 
