@@ -68,7 +68,7 @@ int timeRemaining() {
   int seconds = timeClient.getSeconds();
   int remaining = seconds % 30;
   remaining = (remaining == 0) ? remaining : 30 - remaining;
-
+  yield(); // to avoid WDT reset
   return remaining;
 }
 
